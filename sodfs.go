@@ -22,6 +22,20 @@ func encrypt(data []byte, key string) ([]byte, error) {
 	return []byte(hex.EncodeToString(encrypted)), nil
 }
 
+func decrypt(data []byte, key string) ([]byte, error) {
+	block, err := aes.NewCipher([]byte(key))
+	if err != nil {
+		return nil, err
+	}
+	decodedData := make([]byte, hex.DecodedLen(len(data)))
+	_, err = hex.Decode(decodedData, data)
+	if err != nil {
+		return nil, err
+	}
+	decrypted := make([]byte, len(decodedData))
+	block.Decrypt(decrypted, decodedData)
+	return decrypted, nil
+}
 
 // func decrypt(data []byte, key string) ([]byte, error) {
 	
@@ -45,4 +59,26 @@ func (sodfs *SODFS) WriteFile(filePath string, data []byte) error {
 	}
 
 	return nil
+}
+
+func (sodfs *SODFS) ReadFile(filePath string) ([]byte, error) {
+	file, err := os.Open(filePath)
+	if err != nil {
+		return nil, err
+	}
+	defer file.Close()
+	fileInfo, err := file.Stat()
+	if err != nil {
+		return nil, err
+	}
+	data := make([]byte, fileInfo.Size())
+	_, err = file.Read(data)
+	if err != nil {
+		return nil, err
+	}
+	decryptedData, err := decrypt(data, sodfs.EncryptionKey)
+	if err != nil {
+		return nil, err
+	}
+	return decryptedData, nil
 }
