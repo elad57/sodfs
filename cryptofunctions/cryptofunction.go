@@ -9,7 +9,7 @@ import (
 	"io"
 )
 
-func encrypt(data []byte, key string) ([]byte, error) {
+func Encrypt(data []byte, key string) ([]byte, error) {
 	keyHash := sha256.Sum256([]byte(key))
 	
 	// Create AES cipher block
@@ -36,7 +36,7 @@ func encrypt(data []byte, key string) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func decrypt(data []byte, key string) ([]byte, error) {
+func Decrypt(data []byte, key string) ([]byte, error) {
 	// Create a SHA256 hash of the key to ensure it's 32 bytes (AES-256)
 	keyHash := sha256.Sum256([]byte(key))
 	
